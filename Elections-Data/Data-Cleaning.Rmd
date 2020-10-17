@@ -1,0 +1,43 @@
+---
+title: "Data Cleaning"
+author: "Josiah Meadows"
+date: "10/16/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(fivethirtyeight)
+
+```
+
+```{r}
+
+
+
+state_info %>% 
+  group_by(division) %>% 
+  summarize(number = n()) %>% 
+
+ggplot(mapping = aes(x = division, y = number)) +
+  geom_col()
+
+```
+
+```{r}
+
+police_killings_region <- police_killings %>% 
+  group_by(state) %>%
+  summarize(count_by_state = n()) %>%
+  rename(state_abbrev = state)
+
+state_info <- state_info
+
+police_killings2 <- left_join(police_killings_region, state_info, by = "state_abbrev")
+
+saveRDS(object = police_killings2, file = "police_killings2.rds")
+
+```
+
