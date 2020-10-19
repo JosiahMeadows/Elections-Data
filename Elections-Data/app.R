@@ -9,47 +9,43 @@
 
 library(shiny)
 library(shinythemes)
+library(tidyverse)
+
+police_killings2 <- readRDS("police_killings2.rds")
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(theme = shinytheme("united"),
+ui <- fluidPage(theme = shinytheme("flatly"),
     navbarPage(
         "Elections Data",
-        tabPanel("Analysis",
-                 titlePanel("Elections"),
-                 p("This is where I'm going to analyze my data"),
-                 sidebarLayout(
-                     sidebarPanel(
-                         sliderInput("bin",
-                                     "# of bins:",
-                                     min = 50,
-                                     max = 100,
-                                     value = 30),
-                         selectInput(inputId = "state",
-                                     label = "Choose a State",
-                                     choices = c("OH", "GA", "NY", "MA"))
-                        
-                         
-                     ),
-                     mainPanel(
-                         plotOutput("distPlot")
-                     )
-                 )
+        
+        tabPanel("About",
+                 # Application title
+                 titlePanel("Police Killings by Region in the United States"),
+                 br(),
+                 h3("About the Data"),
+                 p("I got my data from the fivethirtyeight package, and I joined the police killings dataset with the state info dataset. I was interested in figuring out which region in the United States has the highest number of police killings. According to the data, the South tops all other geographic regions. I created a Data Visualization tab to display this bleak data with a bar grap."),
+                 br(),
+                 h3("About Me"),
+                 br(),
+                 h4("Josiah Meadows"),
+                 p("I am a sophomore at Harvard University pursuing a B.A. in Government with a secondary in Economics."),
+                 p("The source code on Github can be found",
+                   a("here.",
+                     href = "https://github.com/JosiahMeadows/Elections-Data"))
+                 
+                 # Sidebar with a slider input for number of bins 
                  
         ),
-        tabPanel("About",
+        
+        tabPanel("Data Visualization",
                  # Application title
                  titlePanel("Voters"),
                  br(),
                  h2("About the Data"),
-                 p("This is where I will tell you more information about where I got my data."),
-                 br(),
-                 h2("About Me"),
-                 p("I am a sophomore at Harvard University pursuing a BA in Government with a secondary in Economics"),
-                 p("The source code on Github can be found",
-                   a("here",
-                     href = "https://github.com/JosiahMeadows/Elections-Data"))
+                 p("According to the data, the South has the highest number of police killings in the United States."),
+        
                  
-                 # Sidebar with a slider input for number of bins 
+                 plotOutput("distPlot2"),
                  
         )
         
@@ -59,14 +55,19 @@ ui <- fluidPage(theme = shinytheme("united"),
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        binsthing <- seq(min(x), max(x), length.out = input$bin + 1)
+    output$distPlot2 <- renderPlot({
         
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = binsthing, col = 'darkgray', border = 'white')
+        police_killings2 %>% 
+            group_by(region) %>% 
+            summarize(killings = sum(count_by_state)) %>% 
+            ggplot(mapping = aes(x = region, y = killings)) +
+            geom_col(fill = "turquoise4") +
+            labs(title = "Number of Police Killings in the United States",
+                 x = "Region",
+                 y = "Killings")
+        
     })
+        
 }
 
 # Run the application 

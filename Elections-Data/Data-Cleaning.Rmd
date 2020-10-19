@@ -15,8 +15,6 @@ library(fivethirtyeight)
 
 ```{r}
 
-
-
 state_info %>% 
   group_by(division) %>% 
   summarize(number = n()) %>% 
