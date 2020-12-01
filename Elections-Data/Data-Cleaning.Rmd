@@ -13,12 +13,16 @@ library(fivethirtyeight)
 library(janitor)
 library(readxl)
 library(ggthemes)
-library(leaflet)
 library(tigris)
+library(dplyr)
+library(leaflet)
 
 ```
 
 ```{r}
+
+# First, I am going to create a graph that shows the number of registered 
+# voters in Florida over time. 
 
 # Source: FL Department of State website.
 
@@ -166,7 +170,7 @@ combined <- bind_rows(fl_dec,
   labs(title = "Monthly Change in Florida Registration (2019-2020)",
        x = "Month",
        y = "Total Number of Registered Voters",
-       caption = "Source: Florida Department of State") +
+       caption = "Source: Florida Department of State (dos.myflorida.com)") +
   theme_classic() +
   theme(legend.position = "right",
         text = element_text(family = "Palatino"),
@@ -289,23 +293,23 @@ mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5)) %>%
                       #fl_jul,
                       #fl_aug) %>%
   
-  mutate(month = c("Dec",
-                   "Jan",
-                   "Feb",
-                   "Mar",
-                   "Apr",
-                   "May",
-                   "Jun",
-                   "Jul",
-                   "Aug")) %>%
+  #mutate(month = c("Dec",
+                   #"Jan",
+                   #"Feb",
+                   #"Mar",
+                   #"Apr",
+                   #"May",
+                   #"Jun",
+                   #"Jul",
+                   #"Aug")) %>%
   
-  pivot_longer(cols = republican_party_of_florida:no_party_affiliation,
-               names_to = "party")
+  #pivot_longer(cols = republican_party_of_florida:no_party_affiliation,
+               #names_to = "party")
   
   # Create map
  
   # Leaflet is like ggplot. AddTiles is almost like theme of ggplot. AddPolygons
-  # adds county shapes/
+  # adds county shapes.
   
   county_shapes <- counties(state = "FL", cb = TRUE)
   
@@ -314,14 +318,108 @@ mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5)) %>%
     addTiles() %>% 
     addPolygons(popup = ~NAME)
   
+sb_county <- fl_jan <- read_xlsx("party-affilation-by-county-09-2020.xlsx", 
+                        skip = 3, sheet = 2) %>% 
+  clean_names() %>%
+  drop_na()
+
+counties_merged_sb <- geo_join(county_shapes, sb_county, "NAME", "county")
+
+pal <- colorBin("Blues", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+
+  counties_merged_sb %>% 
+    leaflet() %>% 
+    addTiles() %>% 
+    addPolygons(popup = ~paste(totals, "Voter Registrations"),
+                fillColor = ~pal(totals))
+
+  # Play around with bins to get the shades to be darker. Capture biggest 
+  # differences.
+ 
+ 
+#pal <- colorNumeric("Greens", domain = combined$values)
+#domain = counties_merged_sb$totals,   
+  
+# Trying out more code from the tutorial on website
+  
+  leaflet() %>% 
+    addProviderTiles("CartoDB.Positron") %>% 
+    setView(-82, 28, zoom = 6) %>% 
+    addPolygons(data = counties_merged_sb,
+                fillColor = ~pal(counties_merged_sb$totals),
+                fillOpacity = 0.7,
+                weight = 0.2,
+                smoothFactor = 0.2,
+                popup = ~popup_sb) %>% 
+    addLegend(pal = pal,
+              values = counties_merged_sb$total,
+              position = "bottomright",
+              title = "Total Registrations")
+  
+```
+
+```{r}
+
+# Perhaps change the month to as.Numeric or something. What I'm trying to 
+# figure out is how to change "03" to just "3". Get rid of the zero in front.
+
+# Maybe create a function to change the month?
+
+covid <- read_csv(file = "raw_data /us-counties.csv") %>% 
+
+  clean_names() %>% 
+  filter(state == "Florida") %>% 
+  mutate(month = str_sub(date, 6, 7)) %>% 
+  group_by(month, county) %>% 
+  summarize(total_cases = sum(cases),
+            total_deaths = sum(deaths)) %>% 
+  filter(month == 10)
+
+# Map
+
+county_shapes <- counties(state = "FL", cb = TRUE)
+  
   county_shapes %>% 
     leaflet() %>% 
     addTiles() %>% 
     addPolygons(popup = ~NAME)
   
-  #geo_join()
+  sb_county2 <- covid %>% 
+    clean_names() %>%
+    drop_na()
+    
+counties_merged_sb2 <- geo_join(county_shapes, sb_county2, "NAME", "county")
+
+pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+
+  counties_merged_sb2 %>% 
+    leaflet() %>% 
+    addTiles() %>% 
+    addPolygons(popup = ~paste(total_cases, "Cases"),
+                fillColor = ~pal(total_cases))
   
-  pal <- colorNumeric("Greens", domain = combined$values)
+    leaflet() %>% 
+    addProviderTiles("CartoDB.Positron") %>% 
+    setView(-82, 28, zoom = 6) %>% 
+    addPolygons(data = counties_merged_sb2,
+                fillColor = ~pal(counties_merged_sb2$total_cases),
+                fillOpacity = 0.7,
+                weight = 0.2,
+                smoothFactor = 0.2,
+                popup = ~popup_sb) %>% 
+    addLegend(pal = pal,
+              values = counties_merged_sb2$total_cases,
+              position = "bottomright",
+              title = "Total Cases")
+```
+
+```{r}
+
+# Read in Florida unemployment data. This dataset is messy.
+
+fl_employment <- read_xlsx("raw_data /LFS_cnty.xlsx", skip = 5) %>% 
+  clean_names() %>% 
+  drop_na()
 
 ```
 
@@ -334,7 +432,7 @@ fl_registrations <- read_tsv(file = "raw_data /Stats_10866_AbsProvided.txt")
 ```
 
 ```{r}
-
+ 
 # This may or may not be useful for the final project.
 
 # Now let's create a second plot displaying the voter registration data for 5
