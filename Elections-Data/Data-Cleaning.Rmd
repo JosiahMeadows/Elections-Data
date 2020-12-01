@@ -9,7 +9,6 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
-library(fivethirtyeight)
 library(janitor)
 library(readxl)
 library(ggthemes)
@@ -25,6 +24,186 @@ library(leaflet)
 # voters in Florida over time. 
 
 # Source: FL Department of State website.
+
+# Sheet 1 (December)
+
+fl_dec <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", skip = 3) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>% 
+  drop_na() %>%
+  filter(county == "TOTALS")
+
+# Sheet 2 (January)
+  
+fl_jan <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx",
+                    skip = 3,
+                    sheet = 2) %>%
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 3 (February)
+
+fl_feb <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3,
+                    sheet = 3) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 4 (March)
+
+fl_mar <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3,
+                    sheet = 4) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 5 (April)
+
+fl_apr <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3,
+                    sheet = 5) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 6 (May)
+
+fl_may <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3,
+                    sheet = 6) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 7 (June)
+
+fl_jun <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3, 
+                    sheet = 7) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 8 (July)
+
+fl_jul <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3,
+                    sheet = 8) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Sheet 9 (August)
+
+fl_aug <- read_xlsx("raw_data /party-affilation-by-county-09-2020.xlsx", 
+                    skip = 3,
+                    sheet = 9) %>% 
+  clean_names() %>%
+  rename(republican = "republican_party_of_florida") %>%
+  rename(democrat = "florida_democratic_party") %>%
+  drop_na() %>% 
+  filter(county == "TOTALS")
+
+# Combined
+
+combined <- bind_rows(fl_dec,
+                      fl_jan,
+                      fl_feb,
+                      fl_mar,
+                      fl_apr,
+                      fl_may,
+                      fl_jun,
+                      fl_jul,
+                      fl_aug) %>%
+  
+  # Reorder the months so they are not in alphabetical order.
+  
+  mutate(month = c("Dec.",
+                   "Jan.",
+                   "Feb.",
+                   "Mar.",
+                   "Apr.",
+                   "May",
+                   "June",
+                   "July",
+                   "Aug.")) %>%
+  
+  mutate(month = fct_relevel(month,
+                             "Dec.",
+                             "Jan.",
+                             "Feb.",
+                             "Mar.",
+                             "Apr.",
+                             "May",
+                             "June",
+                             "July",
+                             "Aug.")) %>%
+  
+# Pivot
+  
+  pivot_longer(cols = republican:democrat, names_to = "party") %>%
+
+# Create the plot
+  
+  ggplot(mapping = aes(x = month, y = value, color = party, group = party)) +
+  geom_line(lwd = 0.7) +
+  labs(title = "Monthly Change in Florida Registration by\nParty (2019-2020)",
+       x = "Month",
+       y = "Total Number of Registered Voters",
+       caption = "Source: Florida Department of State (dos.myflorida.com)") +
+  theme_classic() +
+  theme(legend.position = "right",
+        text = element_text(family = "Palatino"),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(size = 16, face = "bold"),
+        plot.caption = element_text(face = "italic")) +
+  scale_color_manual(values = c("dodgerblue", "lightcoral"),
+                     name = "Party",
+                     labels = c("Democratic", "Republican")) +
+  scale_y_continuous(labels = scales::comma) +
+  
+# Create the vertical lines
+  
+  geom_vline(xintercept = "Mar.", color = "gray") +
+  geom_vline(xintercept = "June", color = "gray") +
+  
+# Add the text to describe the lines
+
+  geom_text(aes(x = "Mar.", label = "WHO DECLARES\nCOVID-19 PANDEMIC", y = 5000000),
+            color = "gray",
+            size = 3) +
+  geom_text(aes(x = "June", label = "KILLING OF\nGEORGE FLOYD", y = 5000000),
+            color = "gray",
+            size = 3)
+
+combined
+
+saveRDS(object = combined, file = "combined.rds")
+
+```
+
+```{r}
+
+# Now combine Republican, Democrat, and third parties into one linear regression.
 
 # Sheet 1 (December)
 
@@ -125,7 +304,7 @@ fl_aug <- read_xlsx("party-affilation-by-county-09-2020.xlsx",
 
 # Combined
 
-combined <- bind_rows(fl_dec,
+combined2 <- bind_rows(fl_dec,
                       fl_jan,
                       fl_feb,
                       fl_mar,
@@ -158,15 +337,14 @@ combined <- bind_rows(fl_dec,
                              "July",
                              "Aug.")) %>%
   
-# Pivot
+  pivot_longer(cols = totals, names_to = "party") %>% 
   
-  pivot_longer(cols = republican:democrat, names_to = "party") %>%
-
-# Create the plot
+  #select(totals, month) %>% 
   
-  ggplot(mapping = aes(x = month, y = value, color = party, group = party)) +
-  geom_point() +
-  geom_line() +
+  # Create the plot
+  
+  ggplot(mapping = aes(x = month, y = value, group = party)) +
+  geom_line(color = "turquoise3", lwd = 0.7) +
   labs(title = "Monthly Change in Florida Registration (2019-2020)",
        x = "Month",
        y = "Total Number of Registered Voters",
@@ -178,11 +356,8 @@ combined <- bind_rows(fl_dec,
         axis.text.y = element_text(size = 10),
         plot.title = element_text(size = 16, face = "bold"),
         plot.caption = element_text(face = "italic")) +
-  scale_color_manual(values = c("dodgerblue", "lightcoral"),
-                     name = "Party",
-                     labels = c("Democratic", "Republican")) +
   scale_y_continuous(labels = scales::comma) +
-  
+
 # Create the vertical lines
   
   geom_vline(xintercept = "Mar.", color = "gray") +
@@ -190,23 +365,17 @@ combined <- bind_rows(fl_dec,
   
 # Add the text to describe the lines
 
-  geom_text(aes(x = "Mar.", label = "COVID-19 Cases Rise", y = 5000000),
+  geom_text(aes(x = "Mar.", label = "WHO DECLARES\nCOVID-19 PANDEMIC",
+                y = 13650000),
             color = "gray",
-            size = 3,
-            angle = 90,
-            vjust = 1.5) +
-  geom_text(aes(x = "June", label = "Killing of George Floyd", y = 5000000),
+            size = 3) +
+  geom_text(aes(x = "June", label = "KILLING OF\nGEORGE FLOYD", y = 13650000),
             color = "gray",
-            angle = 90,
-            size = 3,
-            vjust = 1.5)
-
-combined
-
-saveRDS(object = combined, file = "combined.rds")
+            size = 3)
+  
+combined2
 
 ```
-
 
 
 ```{r}
@@ -332,15 +501,8 @@ pal <- colorBin("Blues", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
     addTiles() %>% 
     addPolygons(popup = ~paste(totals, "Voter Registrations"),
                 fillColor = ~pal(totals))
-
-  # Play around with bins to get the shades to be darker. Capture biggest 
-  # differences.
- 
- 
-#pal <- colorNumeric("Greens", domain = combined$values)
-#domain = counties_merged_sb$totals,   
   
-# Trying out more code from the tutorial on website
+  popup_sb <- paste0("Total: ", as.character(counties_merged_sb$totals))
   
   leaflet() %>% 
     addProviderTiles("CartoDB.Positron") %>% 
@@ -398,6 +560,8 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
     addPolygons(popup = ~paste(total_cases, "Cases"),
                 fillColor = ~pal(total_cases))
   
+  popup_sb <- paste0("Total: ", as.character(counties_merged_sb$totals))
+  
     leaflet() %>% 
     addProviderTiles("CartoDB.Positron") %>% 
     setView(-82, 28, zoom = 6) %>% 
@@ -411,100 +575,4 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
               values = counties_merged_sb2$total_cases,
               position = "bottomright",
               title = "Total Cases")
-```
-
-```{r}
-
-# Read in Florida unemployment data. This dataset is messy.
-
-fl_employment <- read_xlsx("raw_data /LFS_cnty.xlsx", skip = 5) %>% 
-  clean_names() %>% 
-  drop_na()
-
-```
-
-```{r}
-
-#Testing how to read in other datasets. Read in data in the form of .txt.
-
-fl_registrations <- read_tsv(file = "raw_data /Stats_10866_AbsProvided.txt")
-
-```
-
-```{r}
- 
-# This may or may not be useful for the final project.
-
-# Now let's create a second plot displaying the voter registration data for 5
-# swing states
-
-voter_registrations <- read_csv(file = "https://raw.githubusercontent.com/fivethirtyeight/data/master/voter-registration/new-voter-registrations.csv") %>% 
-  clean_names()
-
-voter_registrations %>%
-  rename(state = jurisdiction) %>%
-  filter(state != "California") %>%
-  filter(state != "Illinois") %>%
-  filter(state != "Colorado") %>%
-  filter(state != "Delaware") %>%
-  filter(state != "District of Columbia") %>%
-  filter(state != "Maryland") %>%
-  filter(state != "Virginia") %>%
-  
-  mutate(month = fct_relevel(month, "Dec", "Jan", "Feb", "Mar", "Apr",
-                             "May")) %>%
-  
-  ggplot(mapping = aes(x = month,
-                       y = new_registered_voters,
-                       color = state,
-                       group = state)) +
-  geom_line() +
-            facet_wrap(~ year) +
-            labs(title = "Voter Registration Levels in Swing States (2016 vs. 2020)",
-                 x = "Month",
-                 y = "New Registered Voters",
-                 caption = "Source: FiveThirtyEight") +
-  theme(legend.position = "right", 
-        text = element_text(family = "Palatino"),
-        axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 10))
-  
-  geom_vline(xintercept = "Mar", color = "black")
-
-voter_registrations
-
-saveRDS(object = voter_registrations, file = "voter_registrations.rds")
-
-```
-
-
-```{r}
-
-#This was my code for the previous milestone. I'll delete it once I get the hang
-#of Shiny App.
-
-state_info %>% 
-  group_by(division) %>% 
-  summarize(number = n()) %>% 
-
-ggplot(mapping = aes(x = division, y = number)) +
-  geom_col()
-
-```
-
-```{r}
-
-#This was my code for the previous milestone
-
-police_killings_region <- police_killings %>% 
-  group_by(state) %>%
-  summarize(count_by_state = n()) %>%
-  rename(state_abbrev = state)
-
-state_info <- state_info
-
-police_killings2 <- left_join(police_killings_region, state_info, by = "state_abbrev")
-
-saveRDS(object = police_killings2, file = "police_killings2.rds")
-
 ```
