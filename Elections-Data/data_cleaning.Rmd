@@ -417,34 +417,10 @@ mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5)) %>%
   geom_point() +
   facet_wrap(~ party)
 
-  #ggplot(mapping = aes(x = month, y = value, color = county)) +
-  #geom_point()
-                      
-                      #fl_feb,
-                      #fl_mar,
-                      #fl_apr,
-                      #fl_may,
-                      #fl_jun,
-                      #fl_jul,
-                      #fl_aug) %>%
-  
-  #mutate(month = c("Dec",
-                   #"Jan",
-                   #"Feb",
-                   #"Mar",
-                   #"Apr",
-                   #"May",
-                   #"Jun",
-                   #"Jul",
-                   #"Aug")) %>%
-  
-  #pivot_longer(cols = republican_party_of_florida:no_party_affiliation,
-               #names_to = "party")
-  
-  # Create map
+# Create map
  
-  # Leaflet is like ggplot. AddTiles is almost like theme of ggplot. AddPolygons
-  # adds county shapes.
+# Leaflet is like ggplot. AddTiles is almost like theme of ggplot. AddPolygons
+# adds county shapes.
   
   county_shapes <- counties(state = "FL", cb = TRUE)
   
