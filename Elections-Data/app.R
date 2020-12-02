@@ -56,23 +56,22 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                  plotOutput("registration_numbers"),
                  plotOutput("registration_numbers2"),
                  
-                 br(),
-                 selectInput("A", "Choose month:",
-                             c("January", "February", "March", "April", "May",
-                               "June", "July", "August", "September",
-                               "October", "November", "December")),
-                 h3("Total Voter Registrations by Month in Florida"),
-                 h5("Click on the individual counties to see the numbers"),
 
-                 leafletOutput("registration_numbers3"),
-                 
+                 h3("Total Voter Registrations by Month in Florida"),
+                 h4("(Hover over the map to see the county name and voter registration numbers.)"),
                  br(),
                  selectInput("A", "Choose month:",
                              c("January", "February", "March", "April", "May",
                                "June", "July", "August", "September",
                                "October", "November", "December")),
-                 h3("New Covid-19 Cases in Florida by Month"),
-                 h5("Click on the individual counties to see the numbers"),
+                 leafletOutput("registration_numbers3"),
+                 h3("New COVID-19 Cases in Florida by Month"),
+                 h4("(Hover over the map to see the county name and number of Covid cases.)"),
+                 br(),
+                 selectInput("A", "Choose month:",
+                             c("January", "February", "March", "April", "May",
+                               "June", "July", "August", "September",
+                               "October", "November", "December")),
                  leafletOutput("covid_cases"),
         )
         
@@ -188,7 +187,8 @@ server <- function(input, output) {
         addPolygons(popup = ~paste(totals, "Voter Registrations"),
                     fillColor = ~pal(totals))
       
-      popup_sb <- paste0("Total: ", as.character(counties_merged_sb$totals))
+      popup_sb <- paste0("County: ", as.character(counties_merged_sb$NAME),
+                         "\nTotal Registrations: ", as.character(counties_merged_sb$totals))
       
       leaflet() %>% 
         addProviderTiles("CartoDB.Positron") %>% 
@@ -198,7 +198,16 @@ server <- function(input, output) {
                     fillOpacity = 0.7,
                     weight = 0.2,
                     smoothFactor = 0.2,
-                    popup = ~popup_sb) %>% 
+                    highlight = highlightOptions(
+                      weight = 5,
+                      color = "#666",
+                      fillOpacity = 0.7,
+                      bringToFront = TRUE),
+                    label = popup_sb,
+                    labelOptions = labelOptions(
+                      style = list("font-weight" = "normal", padding = "3px 8px"),
+                      textsize = "15px",
+                      direction = "auto")) %>% 
         addLegend(pal = pal,
                   values = counties_merged_sb$total,
                   position = "bottomright",
@@ -229,7 +238,7 @@ server <- function(input, output) {
         addPolygons(popup = ~paste(total_cases, "Cases"),
                     fillColor = ~pal(total_cases))
       
-      popup_sb2 <- paste0("Total: ", as.character(counties_merged_sb2$totals))
+      popup_sb2 <- paste0("New Cases: ", as.character(counties_merged_sb2$totals))
       
       leaflet() %>% 
         addProviderTiles("CartoDB.Positron") %>% 
@@ -239,7 +248,16 @@ server <- function(input, output) {
                     fillOpacity = 0.7,
                     weight = 0.2,
                     smoothFactor = 0.2,
-                    popup = ~popup_sb) %>% 
+                    highlight = highlightOptions(
+                      weight = 5,
+                      color = "#666",
+                      fillOpacity = 0.7,
+                      bringToFront = TRUE),
+                    label = popup_sb,
+                    labelOptions = labelOptions(
+                      style = list("font-weight" = "normal", padding = "3px 8px"),
+                      textsize = "15px",
+                      direction = "auto")) %>% 
         addLegend(pal = pal,
                   values = counties_merged_sb2$total_cases,
                   position = "bottomright",

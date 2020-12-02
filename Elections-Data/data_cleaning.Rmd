@@ -155,8 +155,8 @@ combined_fl %>%
   theme_classic() +
   theme(legend.position = "right",
         text = element_text(family = "Palatino"),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
         plot.title = element_text(size = 16, face = "bold"),
         plot.caption = element_text(face = "italic")) +
   scale_color_manual(values = c("dodgerblue", "lightcoral"),
@@ -325,8 +325,8 @@ combined_2 %>%
   theme_classic() +
   theme(legend.position = "right",
         text = element_text(family = "Palatino"),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
         plot.title = element_text(size = 16, face = "bold"),
         plot.caption = element_text(face = "italic")) +
   scale_y_continuous(labels = scales::comma) +
@@ -450,7 +450,8 @@ pal <- colorBin("Greens", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
     addPolygons(popup = ~paste(totals, "Voter Registrations"),
                 fillColor = ~pal(totals))
   
-  popup_sb <- paste0("Total: ", as.character(counties_merged_sb$totals))
+  popup_sb <- paste0("County: ", as.character(counties_merged_sb$NAME),
+                     "\nTotal Registrations: ", as.character(counties_merged_sb$totals))
   
   leaflet() %>% 
     addProviderTiles("CartoDB.Positron") %>% 
@@ -460,14 +461,21 @@ pal <- colorBin("Greens", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
                 fillOpacity = 0.7,
                 weight = 0.2,
                 smoothFactor = 0.2,
-                popup = ~popup_sb) %>% 
+                highlight = highlightOptions(
+                  weight = 5,
+                  color = "#666",
+                  fillOpacity = 0.7,
+                  bringToFront = TRUE),
+                label = popup_sb,
+                labelOptions = labelOptions(
+                  style = list("font-weight" = "normal", padding = "3px 8px"),
+                  textsize = "15px",
+                  direction = "auto")) %>% 
     addLegend(pal = pal,
               values = counties_merged_sb$total,
               position = "bottomright",
               title = "Total Registrations")
-  
-  
-  
+
 ```
 
 ```{r}
@@ -511,7 +519,7 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
     addPolygons(popup = ~paste(total_cases, "Cases"),
                 fillColor = ~pal(total_cases))
   
-  popup_sb2 <- paste0("Total: ", as.character(counties_merged_sb2$totals))
+  popup_sb2 <- paste0("New Cases: ", as.character(counties_merged_sb2$totals))
   
     leaflet() %>% 
     addProviderTiles("CartoDB.Positron") %>% 
@@ -521,7 +529,16 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
                 fillOpacity = 0.7,
                 weight = 0.2,
                 smoothFactor = 0.2,
-                popup = ~popup_sb) %>% 
+                highlight = highlightOptions(
+                  weight = 5,
+                  color = "#666",
+                  fillOpacity = 0.7,
+                  bringToFront = TRUE),
+                label = popup_sb,
+                labelOptions = labelOptions(
+                  style = list("font-weight" = "normal", padding = "3px 8px"),
+                  textsize = "15px",
+                  direction = "auto")) %>% 
     addLegend(pal = pal,
               values = counties_merged_sb2$total_cases,
               position = "bottomright",
