@@ -105,7 +105,7 @@ fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>%
 
 # Combined
 
-combined <- bind_rows(fl_dec,
+combined_fl <- bind_rows(fl_dec,
                       fl_jan,
                       fl_feb,
                       fl_mar,
@@ -140,10 +140,12 @@ combined <- bind_rows(fl_dec,
 
 # Pivot
   
-  pivot_longer(cols = republican:democrat, names_to = "party") %>%
+  pivot_longer(cols = republican:democrat, names_to = "party")
 
 # Create the plot
   
+combined_fl %>% 
+
   ggplot(mapping = aes(x = month, y = value, color = party, group = party)) +
   geom_line(lwd = 0.7) +
   labs(title = "Monthly Change in Florida Registration by\nParty (2019-2020)",
@@ -180,9 +182,9 @@ combined <- bind_rows(fl_dec,
             color = "gray",
             size = 3)
 
-combined
+combined_fl
 
-saveRDS(object = combined, file = "combined.rds")
+saveRDS(object = combined_fl, file = "combined_fl.rds")
 
 ```
 
@@ -273,7 +275,7 @@ fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>%
 
 # Combined
 
-combined2 <- bind_rows(fl_dec,
+combined_2 <- bind_rows(fl_dec,
                       fl_jan,
                       fl_feb,
                       fl_mar,
@@ -306,11 +308,13 @@ combined2 <- bind_rows(fl_dec,
                              "July",
                              "Aug.")) %>%
   
-  pivot_longer(cols = totals, names_to = "party") %>% 
+  pivot_longer(cols = totals, names_to = "party")
   
   #select(totals, month) %>% 
   
   # Create the plot
+
+combined_2 %>% 
   
   ggplot(mapping = aes(x = month, y = value, group = party)) +
   geom_line(color = "turquoise3", lwd = 0.7) +
@@ -345,7 +349,9 @@ combined2 <- bind_rows(fl_dec,
             color = "gray",
             size = 3)
   
-combined2
+combined_2
+
+saveRDS(object = combined_2, file = "combined_2.rds")
 
 ```
 
@@ -399,9 +405,7 @@ fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>%
   mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
-combined 
-
-combined <- full_join(fl_dec,
+combined_3 <- full_join(fl_dec,
                       fl_jan,
                       by = "county",
                       suffix = c("_dec", "_jan")) %>% 
@@ -411,11 +415,13 @@ combined <- full_join(fl_dec,
 
 # Use a str sub to extract the month to create a month column.
 
-mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5)) %>%
-  ggplot(mapping = aes(x = month, y = value, group = county, color = county)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ party)
+mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
+  
+#combined_3 %>% 
+  #ggplot(mapping = aes(x = month, y = value, group = county, color = county)) +
+  #geom_line() +
+  #geom_point() +
+  #facet_wrap(~ party)
 
 # Create map
  
@@ -436,7 +442,7 @@ sb_county <- fl_jan <- read_xlsx("raw_data /fl_counties.xlsx",
 
 counties_merged_sb <- geo_join(county_shapes, sb_county, "NAME", "county")
 
-pal <- colorBin("Blues", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+pal <- colorBin("Greens", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
 
   counties_merged_sb %>% 
     leaflet() %>% 
@@ -460,6 +466,8 @@ pal <- colorBin("Blues", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
               position = "bottomright",
               title = "Total Registrations")
   
+  
+  
 ```
 
 ```{r}
@@ -474,9 +482,10 @@ covid <- read_csv(file = "raw_data /us-counties.csv") %>%
   clean_names() %>% 
   filter(state == "Florida") %>% 
   mutate(month = str_sub(date, 6, 7)) %>% 
+  mutate(month = as.numeric(month)) %>% 
   group_by(month, county) %>% 
   summarize(total_cases = sum(cases),
-            total_deaths = sum(deaths)) %>% 
+            total_deaths = sum(deaths), .groups = "drop") %>% 
   filter(month == 10)
 
 # Map
@@ -502,7 +511,7 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
     addPolygons(popup = ~paste(total_cases, "Cases"),
                 fillColor = ~pal(total_cases))
   
-  popup_sb <- paste0("Total: ", as.character(counties_merged_sb$totals))
+  popup_sb2 <- paste0("Total: ", as.character(counties_merged_sb2$totals))
   
     leaflet() %>% 
     addProviderTiles("CartoDB.Positron") %>% 
