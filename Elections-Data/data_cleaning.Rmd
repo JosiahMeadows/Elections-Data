@@ -20,7 +20,7 @@ library(leaflet)
 ```{r part 1}
 
 # First, I am going to create a plot that shows the total voter registration
-# numbers in Florida by party.
+# numbers in Florida by party
 
 # Sheet 1 (December)
 

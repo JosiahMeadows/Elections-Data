@@ -13,9 +13,11 @@ library(tidyverse)
 library(janitor)
 library(readxl)
 library(leaflet)
+library(tigris)
 library(ggthemes)
 
-combined <- readRDS("combined_fl.rds")
+combined_fl <- readRDS("combined_fl.rds")
+combined_2 <- readRDS("combined_2.rds")
 covid <- readRDS("covid.RDS")
 combined_intermediate <- readRDS("combined_intermediate.RDS")
 
