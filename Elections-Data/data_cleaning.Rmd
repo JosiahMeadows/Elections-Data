@@ -362,47 +362,47 @@ saveRDS(object = combined_2, file = "combined_2.rds")
 
 fl_dec <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3) %>% 
   clean_names() %>%
-  mutate(county = str_to_upper(county)) %>% 
+  mutate(county = str_to_title(county)) %>% 
   drop_na()
 
 fl_jan <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 2) %>% 
   clean_names() %>% 
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_feb <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 3) %>% 
   clean_names() %>% 
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_mar <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 4) %>% 
   clean_names() %>% 
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_apr <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 5) %>% 
   clean_names() %>%
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_may <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 6) %>% 
   clean_names() %>%
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_jun <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 7) %>% 
   clean_names() %>% 
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_jul <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 8) %>% 
   clean_names() %>% 
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>% 
   clean_names() %>% 
-  mutate(county = str_to_upper(county)) %>% 
+  #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
 combined_3 <- full_join(fl_dec,
@@ -416,6 +416,25 @@ combined_3 <- full_join(fl_dec,
 # Use a str sub to extract the month to create a month column.
 
 mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
+
+combined_4 <- full_join(fl_feb,
+                      fl_mar,
+                      by = "county",
+                      suffix = c("_feb", "_mar")) %>% 
+
+  pivot_longer(cols = 2:11,
+               names_to = "party") %>% 
+
+# Use a str sub to extract the month to create a month column.
+
+mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
+
+
+combined_intermediate <- bind_rows(combined_3, combined_4)
+
+combined_intermediate %>% filter(month == "jan", party == "florida_democratic_party")
+
+saveRDS(object = combined_intermediate, file = "combined_intermediate.RDS")
   
 #combined_3 %>% 
   #ggplot(mapping = aes(x = month, y = value, group = county, color = county)) +
@@ -493,8 +512,10 @@ covid <- read_csv(file = "raw_data /us-counties.csv") %>%
   mutate(month = as.numeric(month)) %>% 
   group_by(month, county) %>% 
   summarize(total_cases = sum(cases),
-            total_deaths = sum(deaths), .groups = "drop") %>% 
-  filter(month == 10)
+            total_deaths = sum(deaths), .groups = "drop")
+
+write_rds(covid, file = "covid.RDS")
+
 
 # Map
 

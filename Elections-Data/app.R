@@ -16,6 +16,8 @@ library(leaflet)
 library(ggthemes)
 
 combined <- readRDS("combined_fl.rds")
+covid <- readRDS("covid.RDS")
+combined_intermediate <- readRDS("combined_intermediate.RDS")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(theme = shinytheme("lumen"),
@@ -61,17 +63,17 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                  h4("(Hover over the map to see the county name and voter registration numbers.)"),
                  br(),
                  selectInput("A", "Choose month:",
-                             c("January", "February", "March", "April", "May",
-                               "June", "July", "August", "September",
-                               "October", "November", "December")),
+                             c("January" = "jan", "February" = "feb", "March" = "mar", "April" = "apr", "May" = "may",
+                               "June" = "jun", "July" = "jul", "August" = "aug")),
+                 selectInput("A2", "Choose party:", combined_intermediate$party, selected = "florida_democratic_party"),
                  leafletOutput("registration_numbers3"),
                  h3("New COVID-19 Cases in Florida by Month"),
                  h4("(Hover over the map to see the county name and number of Covid cases.)"),
                  br(),
-                 selectInput("A", "Choose month:",
-                             c("January", "February", "March", "April", "May",
-                               "June", "July", "August", "September",
-                               "October", "November", "December")),
+                 selectInput("B", "Choose month:",
+                             c("January" = 1, "February" = 2, "March" = 3, "April" = 4, "May" = 5,
+                               "June" = 6, "July" = 7, "August" = 8, "September" = 9,
+                               "October" = 10, "November" = 11, "December" = 12)),
                  leafletOutput("covid_cases"),
         )
         
@@ -166,27 +168,19 @@ server <- function(input, output) {
     output$registration_numbers3 <- renderLeaflet({
  
       county_shapes <- counties(state = "FL", cb = TRUE)
+    
       
-      county_shapes %>% 
-        leaflet() %>% 
-        addTiles() %>% 
-        addPolygons(popup = ~NAME)
+      sb_county <- combined_intermediate %>% 
+        filter(month == input$A) %>%
+        filter(party == input$A2) %>% 
+        clean_names() %>% 
+        select(county, totals = value)
       
-      sb_county <- fl_jan <- read_xlsx("raw_data /fl_counties.xlsx", 
-                                       skip = 3, sheet = 2) %>% 
-        clean_names() %>%
-        drop_na()
       
       counties_merged_sb <- geo_join(county_shapes, sb_county, "NAME", "county")
       
-      pal <- colorBin("Greens", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
-      
-      counties_merged_sb %>% 
-        leaflet() %>% 
-        addTiles() %>% 
-        addPolygons(popup = ~paste(totals, "Voter Registrations"),
-                    fillColor = ~pal(totals))
-      
+      pal <- colorBin("Greens", bins = c(10, 1000, 5000, 10000, 100000, 200000, Inf))
+
       popup_sb <- paste0("County: ", as.character(counties_merged_sb$NAME),
                          "\nTotal Registrations: ", as.character(counties_merged_sb$totals))
       
@@ -219,24 +213,14 @@ server <- function(input, output) {
       
       county_shapes <- counties(state = "FL", cb = TRUE)
       
-      county_shapes %>% 
-        leaflet() %>% 
-        addTiles() %>% 
-        addPolygons(popup = ~NAME)
-      
       sb_county2 <- covid %>% 
         clean_names() %>%
-        drop_na()
+        drop_na() %>% 
+        filter(month == input$B)
       
       counties_merged_sb2 <- geo_join(county_shapes, sb_county2, "NAME", "county")
       
       pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
-      
-      counties_merged_sb2 %>% 
-        leaflet() %>% 
-        addTiles() %>% 
-        addPolygons(popup = ~paste(total_cases, "Cases"),
-                    fillColor = ~pal(total_cases))
       
       popup_sb2 <- paste0("New Cases: ", as.character(counties_merged_sb2$totals))
       
@@ -253,7 +237,7 @@ server <- function(input, output) {
                       color = "#666",
                       fillOpacity = 0.7,
                       bringToFront = TRUE),
-                    label = popup_sb,
+                    label = popup_sb2,
                     labelOptions = labelOptions(
                       style = list("font-weight" = "normal", padding = "3px 8px"),
                       textsize = "15px",
