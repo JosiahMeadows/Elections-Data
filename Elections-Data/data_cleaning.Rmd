@@ -408,7 +408,7 @@ fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>%
 combined_3 <- full_join(fl_dec,
                       fl_jan,
                       by = "county",
-                      suffix = c("_dec", "_jan")) %>% 
+                      suffix = c("_jan", "_feb")) %>% 
 
   pivot_longer(cols = 2:11,
                names_to = "party") %>% 
@@ -420,7 +420,7 @@ mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
 combined_4 <- full_join(fl_feb,
                       fl_mar,
                       by = "county",
-                      suffix = c("_feb", "_mar")) %>% 
+                      suffix = c("_mar", "_apr")) %>% 
 
   pivot_longer(cols = 2:11,
                names_to = "party") %>% 
@@ -432,9 +432,42 @@ mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
 
 combined_intermediate <- bind_rows(combined_3, combined_4)
 
-combined_intermediate %>% filter(month == "jan", party == "florida_democratic_party")
+combined_intermediate %>%
+  filter(month == "jan", party == "florida_democratic_party")
 
 saveRDS(object = combined_intermediate, file = "combined_intermediate.RDS")
+
+combined_5 <- full_join(fl_apr,
+                      fl_may,
+                      by = "county",
+                      suffix = c("_may", "_jun")) %>% 
+
+  pivot_longer(cols = 2:11,
+               names_to = "party") %>% 
+
+# Use a str sub to extract the month to create a month column.
+
+mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
+
+combined_6 <- full_join(fl_jun,
+                      fl_jul,
+                      fl_aug,
+                      by = "county",
+                      suffix = c("_jul", "_aug")) %>% 
+
+  pivot_longer(cols = 2:11,
+               names_to = "party") %>% 
+
+# Use a str sub to extract the month to create a month column.
+
+mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
+
+combined_full <- bind_rows(combined_3,
+                           combined_4,
+                           combined_5,
+                           combined_6)
+
+saveRDS(object = combined_full, file = "combined_full.RDS")
   
 #combined_3 %>% 
   #ggplot(mapping = aes(x = month, y = value, group = county, color = county)) +
@@ -565,3 +598,12 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
               position = "bottomright",
               title = "Total Cases")
 ```
+
+
+```{r model}
+
+inner
+
+
+```
+

@@ -5,9 +5,8 @@ account: josiahmeadows
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2996660
-bundleId: 3935973
+bundleId: 3936481
 url: https://josiahmeadows.shinyapps.io/Elections-Data/
-when: 1606961725.77168
+when: 1606970718.57424
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .Rapp.history|combined.rds|combined2.rds|data_cleaning.Rmd|fl_registrations.rds|README.md|data_cleaning_files/.DS_Store|data_cleaning_files/figure-latex/part 1-1.pdf|data_cleaning_files/figure-latex/part 2-1.pdf|data_cleaning_files/figure-latex/unnamed-chunk-1-1.pdf|raw_data /.DS_Store|raw_data /fl_counties.xlsx|raw_data /LFS_cnty.xlsx|raw_data /us-counties.csv
