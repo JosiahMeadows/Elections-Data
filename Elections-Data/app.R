@@ -54,7 +54,13 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                  h2("About the Data"),
                  
                  br(),
-                 p("The data does not display any significant change in voter registration across the time period"),
+                 p("According to the regression, there does not seem to be any
+                   significant change immediately after the events indicated
+                   by the vertical lines. It does appear, as one might expect,
+                   that registrations began to slow as the pandemic began to 
+                   accelerate. Voter registrations did increase after the 
+                   killing of George Floyd, but they were began increasing 
+                   in May before his death."),
                  
                  br(),
                  plotOutput("registration_numbers"),
@@ -65,8 +71,14 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                  h4("(Hover over the map to see the county name and voter registration numbers.)"),
                  br(),
                  selectInput("A", "Choose month:",
-                             c("January" = "jan", "February" = "feb", "March" = "mar", "April" = "apr", "May" = "may",
-                               "June" = "jun", "July" = "jul", "August" = "aug")),
+                             c("January" = "jan",
+                               "February" = "feb",
+                               "March" = "mar",
+                               "April" = "apr",
+                               "May" = "may",
+                               "June" = "jun",
+                               "July" = "jul",
+                               "August" = "aug")),
                  selectInput("A2", "Choose party:", combined_intermediate$party, selected = "florida_democratic_party"),
                  leafletOutput("registration_numbers3"),
                  h3("New COVID-19 Cases in Florida by Month"),
