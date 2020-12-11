@@ -697,7 +697,7 @@ pal <- colorBin("Blues", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
 # datasets so it matches with the same column in other. Otherwise, I won't be
 # able to join them
 
-test_1 <- combined_full %>% 
+voters <- combined_full %>% 
   mutate(month = str_replace_all(month, "jan", "1")) %>% 
   mutate(month = str_replace_all(month, "feb", "2")) %>% 
   mutate(month = str_replace_all(month, "mar", "3")) %>% 
@@ -709,14 +709,13 @@ test_1 <- combined_full %>%
   mutate(month = as.numeric(month)) %>% 
   rename(registrations = value)
 
-test_2 <- covid
-
-new_obs <- inner_join(test_1, test_2, by = c("county", "month"))
+new_obs <- inner_join(voters, jobs, by = c("county", "month"))
+new_obs2 <- inner_join(new_obs, covid, by = c("county", "month"))
 
 # Now let's go ahead and create the stan_glm()
 
-fit_obj<- stan_glm(data = new_obs,
-         formula = registrations ~ total_cases + total_deaths,
+fit_obj<- stan_glm(data = new_obs2,
+         formula = registrations ~ total_unemp + total_deaths + total_cases,
          family = gaussian(),
          refresh = 0)
 

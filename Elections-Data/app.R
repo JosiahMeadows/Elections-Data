@@ -47,7 +47,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  br(),
                  
-                 h2("Graphs"),
+                 h2("Linear Regressions"),
                  p("First, I created two linear regressions with vertical lines 
                    on the x-axis denoting the occurrence of significant events
                    in 2020. The goal was to see if there was any change
@@ -147,6 +147,14 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                "December" = 12)),
                  leafletOutput("covid_cases"),
                  
+                 br(),
+                 
+                 h3("Total Unemployment Numbers in Florida by Month"),
+                 h4("(Hover over the map to see the county name and number of 
+                    unemployment and employment numbers.)"),
+                 
+                 br(),
+                 
                  selectInput("C", "Choose month:",
                              c("January" = 1,
                                "February" = 2,
@@ -199,8 +207,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                    registration numbers from the official Florida Department of
                    State website and organized it for the purposes of this
                    project. Next, I obtained data on COVID-19 cases in Florida
-                   from the New York Times. Florida Department of Economic 
-                   Opportunity"),
+                   from the New York Times. The data on employment comes from 
+                   the Florida Department of Economic Opportunity."),
                  
                  h3("About Me"),
                  
@@ -383,7 +391,8 @@ server <- function(input, output) {
       
       pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
       
-      popup_sb2 <- paste0("New Cases: ",
+      popup_sb2 <- paste0("County: ", as.character(counties_merged_sb$NAME),
+                          "\nNew Cases: ",
                           as.character(counties_merged_sb2$total_cases),
                           "\nNew Deaths: ", 
                           as.character(counties_merged_sb2$total_deaths))
@@ -428,7 +437,8 @@ server <- function(input, output) {
       
       pal <- colorBin("Oranges", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
       
-      popup_sb3 <- paste0("Total Unemployment: ",
+      popup_sb3 <- paste0("County: ", as.character(counties_merged_sb$NAME),
+                          "\nTotal Unemployment: ",
                           as.character(counties_merged_sb3$total_unemp),
                           "\nTotal Employment: ", 
                           as.character(counties_merged_sb3$total_emp))
