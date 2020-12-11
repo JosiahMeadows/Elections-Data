@@ -8,16 +8,26 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+# Load all of the necessary libraries here!
+
 library(tidyverse)
 library(janitor)
 library(readxl)
 library(tigris)
 library(dplyr)
 library(leaflet)
+library(rstanarm)
+library(gtsummary)
+library(broom.mixed)
+library(gt)
 
 ```
 
 ```{r part 1}
+
+# This is my data cleaning file, where I do all of the scratch work for my 
+# Shiny App. I spent most of the time working here and then transfer everything
+# over later.
 
 # First, I am going to create a plot that shows the total voter registration
 # numbers in Florida by party
@@ -103,7 +113,8 @@ fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>%
   drop_na() %>% 
   filter(county == "TOTALS")
 
-# Combined
+# Now it's time to combined all of those sheets that I created above into one
+# huge dataset.
 
 combined_fl <- bind_rows(fl_dec,
                       fl_jan,
@@ -115,8 +126,6 @@ combined_fl <- bind_rows(fl_dec,
                       fl_jul,
                       fl_aug) %>%
   
-# Reorder the months so they are not in alphabetical order.
-  
   mutate(month = c("Dec.",
                    "Jan.",
                    "Feb.",
@@ -126,6 +135,8 @@ combined_fl <- bind_rows(fl_dec,
                    "June",
                    "July",
                    "Aug.")) %>%
+  
+# Let's reorder the months so they are not in alphabetical order.
   
   mutate(month = fct_relevel(month,
                              "Dec.",
@@ -138,7 +149,7 @@ combined_fl <- bind_rows(fl_dec,
                              "July",
                              "Aug.")) %>%
 
-# Pivot
+# Now I need to pivot heree
   
   pivot_longer(cols = republican:democrat, names_to = "party")
 
@@ -190,7 +201,8 @@ saveRDS(object = combined_fl, file = "combined_fl.rds")
 
 ```{r part 2}
 
-# Now combine Republican, Democrat, and third parties into one linear regression.
+# Now let's combine Republican, Democrat, and third parties into one linear
+# regression.
 
 # Sheet 1 (December)
 
@@ -405,6 +417,10 @@ fl_aug <- read_xlsx("raw_data /fl_counties.xlsx", skip = 3, sheet = 9) %>%
   #mutate(county = str_to_upper(county)) %>% 
   drop_na()
 
+# This is a long, complicated section where I combine all of the months into
+# a single tibble that I can easily use in my Shiny App. The reason I did this
+# step was so that I could easily create the dropdown list in the Shiny App.
+
 combined_3 <- full_join(fl_dec,
                       fl_jan,
                       by = "county",
@@ -469,6 +485,8 @@ combined_full <- bind_rows(combined_3,
 
 saveRDS(object = combined_full, file = "combined_full.RDS")
   
+# More useful code:
+
 #combined_3 %>% 
   #ggplot(mapping = aes(x = month, y = value, group = county, color = county)) +
   #geom_line() +
@@ -532,10 +550,7 @@ pal <- colorBin("Greens", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
 
 ```{r}
 
-# Perhaps change the month to as.Numeric or something. What I'm trying to 
-# figure out is how to change "03" to just "3". Get rid of the zero in front.
-
-# Maybe create a function to change the month?
+# Now let's do the same for the Covid data!
 
 covid <- read_csv(file = "raw_data /us-counties.csv") %>% 
 
@@ -547,8 +562,9 @@ covid <- read_csv(file = "raw_data /us-counties.csv") %>%
   summarize(total_cases = sum(cases),
             total_deaths = sum(deaths), .groups = "drop")
 
-write_rds(covid, file = "covid.RDS")
+# Save my rds afterwards as always!
 
+write_rds(covid, file = "covid.RDS")
 
 # Map
 
@@ -564,6 +580,8 @@ county_shapes <- counties(state = "FL", cb = TRUE)
     drop_na()
     
 counties_merged_sb2 <- geo_join(county_shapes, sb_county2, "NAME", "county")
+
+# Specify the shades of red and the numbers to which they correspond.
 
 pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
 
@@ -588,7 +606,7 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
                   color = "#666",
                   fillOpacity = 0.7,
                   bringToFront = TRUE),
-                label = popup_sb,
+                label = popup_sb2,
                 labelOptions = labelOptions(
                   style = list("font-weight" = "normal", padding = "3px 8px"),
                   textsize = "15px",
@@ -599,9 +617,115 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
               title = "Total Cases")
 ```
 
+```{r jobs}
+
+jobs <- read_xlsx("raw_data /LAUS2020.xlsx", skip = 4) %>% 
+  clean_names() %>%
+    rename(county = area, 
+         month = mo,
+         employed = emp,
+         unemployed = unemp) %>%
+  mutate(county = str_remove_all(county, " County")) %>% 
+  group_by(month, county) %>%
+  summarize(total_unemp = sum(unemployed),
+            total_emp = sum(employed), 
+            .groups = "drop")
+  
+# Save my rds afterwards as always!
+
+write_rds(jobs, file = "jobs.RDS")
+
+# Map
+
+county_shapes <- counties(state = "FL", cb = TRUE)
+  
+  county_shapes %>% 
+    leaflet() %>% 
+    addTiles() %>% 
+    addPolygons(popup = ~NAME)
+  
+  sb_county3 <- jobs %>% 
+    clean_names() %>%
+    drop_na()
+    
+counties_merged_sb3 <- geo_join(county_shapes, sb_county3, "NAME", "county")
+
+# Specify the shades of red and the numbers to which they correspond.
+
+pal <- colorBin("Blues", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+
+  counties_merged_sb3 %>% 
+    leaflet() %>% 
+    addTiles() %>% 
+    addPolygons(popup = ~paste(total_unemp, "Unemployed"),
+                fillColor = ~pal(total_unemp))
+  
+  popup_sb3 <- paste0("Total Unemployed: ",
+                      as.character(counties_merged_sb3$totals))
+  
+    leaflet() %>% 
+    addProviderTiles("CartoDB.Positron") %>% 
+    setView(-82, 28, zoom = 6) %>% 
+    addPolygons(data = counties_merged_sb3,
+                fillColor = ~pal(counties_merged_sb3$total_unemp),
+                fillOpacity = 0.7,
+                weight = 0.2,
+                smoothFactor = 0.2,
+                highlight = highlightOptions(
+                  weight = 5,
+                  color = "#666",
+                  fillOpacity = 0.7,
+                  bringToFront = TRUE),
+                label = popup_sb3,
+                labelOptions = labelOptions(
+                  style = list("font-weight" = "normal", padding = "3px 8px"),
+                  textsize = "15px",
+                  direction = "auto")) %>% 
+    addLegend(pal = pal,
+              values = counties_merged_sb3$total_unemp,
+              position = "bottomright",
+              title = "Total Unemployed")
+
+
+```
 
 ```{r model}
 
+# I create my model in this code chunk
+
+# Before creating the model, however, I need to reformat the columns in one
+# datasets so it matches with the same column in other. Otherwise, I won't be
+# able to join them
+
+test_1 <- combined_full %>% 
+  mutate(month = str_replace_all(month, "jan", "1")) %>% 
+  mutate(month = str_replace_all(month, "feb", "2")) %>% 
+  mutate(month = str_replace_all(month, "mar", "3")) %>% 
+  mutate(month = str_replace_all(month, "apr", "4")) %>% 
+  mutate(month = str_replace_all(month, "may", "5")) %>% 
+  mutate(month = str_replace_all(month, "jun", "6")) %>% 
+  mutate(month = str_replace_all(month, "jul", "7")) %>% 
+  mutate(month = str_replace_all(month, "aug", "8")) %>% 
+  mutate(month = as.numeric(month)) %>% 
+  rename(registrations = value)
+
+test_2 <- covid
+
+new_obs <- inner_join(test_1, test_2, by = c("county", "month"))
+
+# Now let's go ahead and create the stan_glm()
+
+fit_obj<- stan_glm(data = new_obs,
+         formula = registrations ~ total_cases + total_deaths,
+         family = gaussian(),
+         refresh = 0)
+
+print(fit_obj, digits = 4)
+
+tbl_regression(fit_obj, intercept = TRUE) %>% 
+  as_gt()
+
+saveRDS(object = table, file = "table.rds")
 
 ```
 
