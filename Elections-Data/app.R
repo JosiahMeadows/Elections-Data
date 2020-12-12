@@ -14,6 +14,7 @@ library(shinythemes)
 library(tidyverse)
 library(janitor)
 library(readxl)
+library(dplyr)
 library(leaflet)
 library(tigris)
 library(ggthemes)
@@ -126,7 +127,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  br(),
                  
-                 h3("New COVID-19 Cases in Florida by Month"),
+                 h3("Total COVID-19 Cases in Florida by Month"),
                  h4("(Hover over the map to see the county name and number of 
                     cases and deaths.)"),
                  
@@ -143,8 +144,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                "August" = 8,
                                "September" = 9,
                                "October" = 10,
-                               "November" = 11,
-                               "December" = 12)),
+                               "November" = 11)),
                  leafletOutput("covid_cases"),
                  
                  br(),
@@ -174,15 +174,33 @@ ui <- fluidPage(theme = shinytheme("flatly"),
         tabPanel("Model",
 
                  h3("Statistical Model"),
-                 p("I created a model to measure the relationship between voter
-                 registrations and COVID cases and deaths. The
-                 table below displays the findings. According to the table, the
-                 Intercept is 61,450, which represents the average number of
-                 voter registrations. It also shows us that the total number of
-                 cases has very little relationship with the registration
-                 numbers (-0.16). The relationship between total deaths is
-                 slightly higher (24), but this is well within the confidence
-                   interval."),
+                 
+                 p("I created a model to measure the relationship between FL
+                   voter registrations, unemployment levels, and COVID-19 cases
+                   and deaths. My hypothesis was that the more an area suffered
+                   from unemployment and COVID, the people in that area would be
+                   motivated to register to vote. My reasoning was that higher
+                   the suffering, the more people care about who is in power."),
+                 
+                 br(),
+                 
+                 p("While the findings in the table below are not necessarily
+                   definitive, they are consistent with this hypothesis.
+                   According to the table, the Intercept is 27,749, which 
+                   represents the average number of voter registrations. The
+                   total number of cases appears to have very little
+                   relationship with the registration numbers (-0.06). There is,
+                   however, a stronger correlation between unemployment numbers
+                   and registrations (3.3). The model suggests that the higher the 
+                   unemployment, the more voter registrations one will see. The
+                   most significant correlation is between total deaths
+                   from COVID-19 and voter registration numbers (7). The 
+                   relationship is positive, suggesting that the more deaths in an
+                   area, the more voter registrations. Thus, while the findings
+                   are not definitive, they are still consistent with my initial
+                   hypothesis."),
+                 
+                 br(),
                  
                  gt_output("table"),
                  
@@ -217,7 +235,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 Economics. Contact me at josiahmeadows@college.harvard.edu. The
                    source code on my Github can be found",
                    a("here.",
-                     href = "https://github.com/JosiahMeadows/Elections-Data")),
+                     href = "https://github.com/JosiahMeadows/Elections-Data"), "Testing"),
 
 
         )
@@ -322,7 +340,7 @@ server <- function(input, output) {
        
     output$registration_numbers3 <- renderLeaflet({
  
-      county_shapes <- counties(state = "FL", cb = TRUE)
+      county_shapes <- counties(state = "12", cb = TRUE)
     
       sb_county <- combined_full %>% 
         filter(month == input$A) %>%
@@ -336,14 +354,14 @@ server <- function(input, output) {
       # to which they correspond.
       
       pal <- colorBin("Greens",
-                      bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+                      bins = c(0, 100, 500, 1000, 5000, 10000, 100000, 200000, Inf))
       
       # This creates the nice popup feature which gives the user the
       # information.
 
-      popup_sb <- paste0("County: ", as.character(counties_merged_sb$NAME),
-                         "\nTotal Registrations: ",
-                         as.character(counties_merged_sb$totals))
+      popup_sb <- paste("County: ", as.character(counties_merged_sb$NAME),
+                         "Total Registrations: ",
+                        as.character(counties_merged_sb$totals))
       
       # Finally, print the map. The code below also highlights individual
       # counties, a nice enhancement to the interactive experience!
@@ -355,6 +373,7 @@ server <- function(input, output) {
                     fillColor = ~pal(counties_merged_sb$totals),
                     fillOpacity = 0.7,
                     weight = 0.2,
+                    color = "#666",
                     smoothFactor = 0.2,
                     highlight = highlightOptions(
                       weight = 5,
@@ -380,7 +399,7 @@ server <- function(input, output) {
     
     output$covid_cases <- renderLeaflet({
       
-      county_shapes <- counties(state = "FL", cb = TRUE)
+      county_shapes <- counties(state = "12", cb = TRUE)
       
       sb_county2 <- covid %>% 
         clean_names() %>%
@@ -389,13 +408,11 @@ server <- function(input, output) {
       
       counties_merged_sb2 <- geo_join(county_shapes, sb_county2, "NAME", "county")
       
-      pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+      pal <- colorBin("Reds", bins = c(0, 100, 500, 1000, 5000, 10000, 100000, 200000, Inf))
       
-      popup_sb2 <- paste0("County: ", as.character(counties_merged_sb$NAME),
-                          "\nNew Cases: ",
-                          as.character(counties_merged_sb2$total_cases),
-                          "\nNew Deaths: ", 
-                          as.character(counties_merged_sb2$total_deaths))
+      popup_sb2 <- paste("County: ", as.character(counties_merged_sb2$NAME),
+                         "New Cases: ", as.character(counties_merged_sb2$total_cases),
+                         "New Deaths: ", as.character(counties_merged_sb2$total_deaths))
       
       # Create the map!
       
@@ -406,6 +423,7 @@ server <- function(input, output) {
                     fillColor = ~pal(counties_merged_sb2$total_cases),
                     fillOpacity = 0.7,
                     weight = 0.2,
+                    color = "#666",
                     smoothFactor = 0.2,
                     highlight = highlightOptions(
                       weight = 5,
@@ -426,7 +444,7 @@ server <- function(input, output) {
     
     output$job_numbers <- renderLeaflet({
       
-      county_shapes <- counties(state = "FL", cb = TRUE)
+      county_shapes <- counties(state = "12", cb = TRUE)
       
       sb_county3 <- jobs %>% 
         clean_names() %>%
@@ -435,12 +453,13 @@ server <- function(input, output) {
       
       counties_merged_sb3 <- geo_join(county_shapes, sb_county3, "NAME", "county")
       
-      pal <- colorBin("Oranges", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
+      pal <- colorBin("Oranges",
+                      bins = c(0, 100, 500, 1000, 5000, 10000, 100000, 200000, Inf))
       
-      popup_sb3 <- paste0("County: ", as.character(counties_merged_sb$NAME),
-                          "\nTotal Unemployment: ",
+      popup_sb3 <- paste("County: ", as.character(counties_merged_sb3$NAME),
+                          "Total Unemployment: ",
                           as.character(counties_merged_sb3$total_unemp),
-                          "\nTotal Employment: ", 
+                          "Total Employment: ", 
                           as.character(counties_merged_sb3$total_emp))
       
       # Create the map!
@@ -452,6 +471,7 @@ server <- function(input, output) {
                     fillColor = ~pal(counties_merged_sb3$total_unemp),
                     fillOpacity = 0.7,
                     weight = 0.2,
+                    color = "#666",
                     smoothFactor = 0.2,
                     highlight = highlightOptions(
                       weight = 5,
@@ -470,6 +490,14 @@ server <- function(input, output) {
       
     })
 
+    output$table <- render_gt({
+      
+      table %>% 
+        as_gt() %>% 
+        tab_header(title = md("*Regression of Unemployment Levels, COVID Cases & Deaths on FL Voter Registrations*"))
+      
+    })
+  
 }
 
 # Run the application 

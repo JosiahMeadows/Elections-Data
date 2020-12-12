@@ -5,8 +5,8 @@ account: josiahmeadows
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2996660
-bundleId: 3938803
+bundleId: 3980124
 url: https://josiahmeadows.shinyapps.io/Elections-Data/
-when: 1607012486.37219
+when: 1607801326.85012
 asMultiple: FALSE
 asStatic: FALSE

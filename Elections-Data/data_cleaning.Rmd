@@ -481,7 +481,8 @@ mutate(month = str_sub(party, -3, ), party = str_sub(party, , -5))
 combined_full <- bind_rows(combined_3,
                            combined_4,
                            combined_5,
-                           combined_6)
+                           combined_6) %>% 
+  mutate(county = str_replace_all(county, "Desoto", "DeSoto"))
 
 saveRDS(object = combined_full, file = "combined_full.RDS")
   
@@ -564,7 +565,9 @@ covid <- read_csv(file = "raw_data /us-counties.csv") %>%
 
 # Save my rds afterwards as always!
 
-write_rds(covid, file = "covid.RDS")
+#write_rds(covid, file = "covid.RDS")
+
+saveRDS(object = covid, file = "covid.RDS")
 
 # Map
 
@@ -633,7 +636,9 @@ jobs <- read_xlsx("raw_data /LAUS2020.xlsx", skip = 4) %>%
   
 # Save my rds afterwards as always!
 
-write_rds(jobs, file = "jobs.RDS")
+#write_rds(jobs, file = "jobs.RDS")
+
+saveRDS(object = jobs, file = "jobs.RDS")
 
 # Map
 
@@ -721,8 +726,7 @@ fit_obj<- stan_glm(data = new_obs2,
 
 print(fit_obj, digits = 4)
 
-tbl_regression(fit_obj, intercept = TRUE) %>% 
-  as_gt()
+table <- tbl_regression(fit_obj, intercept = TRUE)
 
 saveRDS(object = table, file = "table.rds")
 
