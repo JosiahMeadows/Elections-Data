@@ -43,28 +43,30 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  # This is where I put the title for my first panel.
                  
-                 titlePanel("The Driving Forces Behind Florida 
-                            Voter Registrations"),
+                 titlePanel("Forces Behind Florida Voter Registrations"),
                  
                  br(),
                  
                  h2("Linear Regressions"),
-                 p("First, I created two linear regressions with vertical lines 
-                   on the x-axis denoting the occurrence of significant events
-                   in 2020. The goal was to see if there was any change
-                   immediately before or after the vertical lines. The first
-                   graphs breaks down the Florida monthly registration numbers
+                 
+                 p("First, I created two linear regressions showing voter
+                   registrations over time. I then added vertical lines on the
+                   x-axis denoting the occurrence of significant events in 2020.
+                   The goal was to see if there was any noticeable change in
+                   registrations immediately after those events took place.
+                   The first graph breaks down the Florida registration numbers
                    by party, and the second combines all of the parties."),
                  
                  br(),
                  
                  p("According to both of the regressions below, there does not
-                 seem to be any significant change in voter registration levels
-                 immediately after the events indicated by the vertical lines.
-                 It does appear, as one might expect, that registrations began
-                 to slow as the pandemic began to accelerate. Voter
-                 registrations did increase after the killing of George Floyd,
-                 but they were already increasing in May before his death."),
+                   seem to be any significant change in voter registration
+                   levels immediately after the events indicated by the vertical
+                   lines. It does appear, as one would expect, that
+                   registrations slowed as the pandemic accelerated. Voter 
+                   registrations did increase after the killing of George Floyd,
+                   but they were already trending upwards in May before his
+                   death."),
                  
                  br(),
                  
@@ -78,8 +80,12 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  plotOutput("registration_numbers2"),
                  
                  h2("Interactive Maps"),
-                 p("Second, I created some colorful interactive maps to see if
-                 there might be any clear visual patterns between the datasets."),
+                 p("Second, I created three interactive maps to see if there 
+                   were any striking visual similarities or differences between
+                   the datasets I used. The user can select the month and
+                   visually compare rising unemployment and COVID-19 cases with
+                   increasing voter registrations across different Florida
+                   counties."),
                  
                  br(),
                  
@@ -175,30 +181,33 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
                  h3("Statistical Model"),
                  
-                 p("I created a model to measure the relationship between FL
-                   voter registrations, unemployment levels, and COVID-19 cases
-                   and deaths. My hypothesis was that the more an area suffered
-                   from unemployment and COVID, the people in that area would be
-                   motivated to register to vote. My reasoning was that higher
-                   the suffering, the more people care about who is in power."),
+                 p("I created a statistical model to measure the relationship
+                   between unemployment levels, COVID-19 cases and deaths, and
+                   voter registration numbers. The table below displays the 
+                   results. My hypothesis was that the more a particular region
+                   suffered with respect to health and the economy, the more
+                   people in that region would register to vote. My reasoning
+                   was that when circumstances grow dire, political leadership
+                   gains even more importance and the cost of not participating
+                   in an election rises."),
                  
                  br(),
                  
                  p("While the findings in the table below are not necessarily
-                   definitive, they are consistent with this hypothesis.
-                   According to the table, the Intercept is 27,749, which 
-                   represents the average number of voter registrations. The
-                   total number of cases appears to have very little
-                   relationship with the registration numbers (-0.06). There is,
-                   however, a stronger correlation between unemployment numbers
-                   and registrations (3.3). The model suggests that the higher the 
-                   unemployment, the more voter registrations one will see. The
-                   most significant correlation is between total deaths
-                   from COVID-19 and voter registration numbers (7). The 
-                   relationship is positive, suggesting that the more deaths in an
-                   area, the more voter registrations. Thus, while the findings
-                   are not definitive, they are still consistent with my initial
-                   hypothesis."),
+                   definitive, they are consistent with the hypothesis. The
+                   intercept (27,749) represents the average number of FL voter
+                   registrations in 2020. There appears to be very little 
+                   relationship between the number of cases and registration
+                   numbers (-0.06). However, there is a more significant 
+                   correlation between unemployment numbers and registrations
+                   (3.3). The model suggests that the higher unemployment, the
+                   more voter registrations there will be. Deaths from COVID-19
+                   are also positively correlated with voter registration 
+                   numbers. While the findings are not definitive, they are
+                   consistent with the hypothesis that hardship with respect to
+                   health and the economy increases the cost of staying out of 
+                   the electoral process. (Whether those who registered actually
+                   voted is outside the scope of this project.)"),
                  
                  br(),
                  
@@ -209,24 +218,39 @@ ui <- fluidPage(theme = shinytheme("flatly"),
         tabPanel("About",
 
                  h3("About the Project"),
+                 
                  p("The 2020 U.S. Presidential Election saw the highest voter
-                 turnout in 120 years. Voter enthusiasm was sky high across the 
-                 country. A devastating pandemic, economic pain, civil unrest,
-                 and movements for racial justice have often been cited as the
-                 leading factors which mobilized the masses. The goal of this 
-                 project is to determine how much of a correlation might exist
-                 between an increase in voter registration numbers and rising 
-                 COVID-19 cases and other significant events in 2020."),
+                   turnout in over a century. A devastating pandemic, economic
+                   pain, civil unrest, and movements for racial justice have
+                   often been cited as the leading factors which mobilized the
+                   masses. The goal of this project is to measure how closely
+                   rising unemployment, COVID-19 deaths and cases, and other
+                   pivotal events correlate with increases in FL voter
+                   registration numbers. By quantifying the relationship, one
+                   can gain insights as to which variables were the strongest
+                   predictors of voter registrations. Although my model is 
+                   predictive rather than causal, it still could potentially
+                   allow one to better understand the forces which impel people 
+                   to take the first step in getting involved in the electoral
+                   process."),
                  
                  h3("About the Data"),
                  p("I decided to hone in on the State of Florida, a critical 
-                   battleground state which has often been considered a
+                   battleground state which has long been considered a
                    microcosm of U.S. politics. I gathered the data on
-                   registration numbers from the official Florida Department of
-                   State website and organized it for the purposes of this
-                   project. Next, I obtained data on COVID-19 cases in Florida
-                   from the New York Times. The data on employment comes from 
-                   the Florida Department of Economic Opportunity."),
+                   registration numbers from the official",
+                   a("Florida Department of State",
+                     href = "https://dos.myflorida.com/elections/data-statistics/voter-registration-statistics/voter-registration-reportsxlsx/"),
+                   "website. For COVID-19 cases and deaths in Florida, I
+                   obtained data from",
+                   a("The New York Times",
+                     href = "https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html"),
+                   "based on reports from state and local health agencies. The
+                   data on employment comes from the",
+                   a("Florida Department of Economic Opportunity.",
+                     href = "https://floridajobs.org/workforce-statistics/data-center/statistical-programs/local-area-unemployment-statistics"),
+                   "I cleaned and organized all datasets for the purposes of
+                   this project."),
                  
                  h3("About Me"),
                  
@@ -235,7 +259,10 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 Economics. Contact me at josiahmeadows@college.harvard.edu. The
                    source code on my Github can be found",
                    a("here.",
-                     href = "https://github.com/JosiahMeadows/Elections-Data"), "Testing"),
+                     href = "https://github.com/JosiahMeadows/Elections-Data"),
+                   "My LinkedIn profile can be found",
+                   a("here.",
+                     href = "https://www.linkedin.com/in/josiah-meadows-1441601b5/")),
 
 
         )
