@@ -619,3 +619,8 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+# NOTE: I kept getting a warning when I ran the app. My TF said I didn't
+# have to worry about this particular warning since I am using using Leaflet,
+# which is outside the scope of the Gov 50 course. In all other instances when I
+# got warnings, I changed the code to address them.

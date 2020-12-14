@@ -378,7 +378,13 @@ saveRDS(object = combined_2, file = "combined_2.rds")
 ```
 
 
-```{r}
+```{r map 1, warning=FALSE}
+
+# Note: I kept getting a warning when I ran this code chunk. My TF said I didn't
+# have to worry about this particular warning since I am using using Leaflet,
+# which is outside the scope of the Gov 50 course. I simply used warning=FALSE
+# to hide it. In all other instances when I got warnings, I changed the code to
+# address them.
 
 # Here, I look at increases by county in Florida.
 
@@ -508,9 +514,9 @@ saveRDS(object = combined_full, file = "combined_full.RDS")
 # Create map.
  
 # Leaflet is like ggplot. AddTiles is almost like the theme of ggplot.
-# AddPolygons adds county shapes.
+# AddPolygons adds county shapes. 12 is the number for the state of Florida.
   
-  county_shapes <- counties(state = "FL", cb = TRUE)
+  county_shapes <- counties(state = "12", cb = TRUE)
   
   county_shapes %>% 
     leaflet() %>% 
@@ -569,7 +575,13 @@ pal <- colorBin("Greens", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
 
 ```
 
-```{r}
+```{r leaflet 2, warning=FALSE}
+
+# Note: I kept getting a warning when I ran this code chunk. My TF said I didn't
+# have to worry about this particular warning since I am using using Leaflet,
+# which is outside the scope of the Gov 50 course. I simply used warning=FALSE
+# to hide it. In all other instances when I got warnings, I changed the code to
+# address them.
 
 # Now let's do the same for the COVID data.
 
@@ -589,7 +601,9 @@ saveRDS(object = covid, file = "covid.RDS")
 
 # Map
 
-county_shapes <- counties(state = "FL", cb = TRUE)
+# 12 is the number for the state of Florida.
+
+county_shapes <- counties(state = "12", cb = TRUE)
   
   county_shapes %>% 
     leaflet() %>% 
@@ -647,7 +661,13 @@ pal <- colorBin("Reds", bins = c(1000, 5000, 10000, 100000, 200000, Inf))
               title = "Total Cases")
 ```
 
-```{r jobs}
+```{r leaflet 3, warning=FALSE}
+
+# Note: I kept getting a warning when I ran this code chunk. My TF said I didn't
+# have to worry about this particular warning since I am using using Leaflet,
+# which is outside the scope of the Gov 50 course. I simply used warning=FALSE
+# to hide it. In all other instances when I got warnings, I changed the code to
+# address them.
 
 # Now, I want to include unemployment data, too. Let's read in the data in do
 # some cleaning.
