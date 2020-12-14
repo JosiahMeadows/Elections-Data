@@ -507,9 +507,9 @@ server <- function(input, output) {
                                        200000, Inf))
       
       popup_sb2 <- paste("County: ", as.character(counties_merged_sb2$NAME),
-                         "New Cases: ",
+                         "Total Cases: ",
                          as.character(counties_merged_sb2$total_cases),
-                         "New Deaths: ",
+                         "Total Deaths: ",
                          as.character(counties_merged_sb2$total_deaths))
       
       # Code for the map is below.
