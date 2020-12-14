@@ -22,8 +22,9 @@ library(gtsummary)
 library(broom.mixed)
 library(gt)
 
-# There is where you put the RDS, which makes sure that the Shiny App knows the
-#information from the .Rmd file.
+# I saved information from the data_cleaning.Rmd to RDS files so I could easily
+# translate that information to the Shiny App. I place all of the RDS files here
+# at the top and will use them below.
 
 combined_fl <- readRDS("combined_fl.rds")
 combined_2 <- readRDS("combined_2.rds")
@@ -47,19 +48,21 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  br(),
                  
-                 h2("Linear Regressions"),
+                 # This is where I interpret the linegraphs.
                  
-                 p("First, I created two linear regressions showing voter
-                   registrations over time. I then added vertical lines on the
-                   x-axis denoting the occurrence of significant events in 2020.
-                   The goal was to see if there was any noticeable change in
-                   registrations immediately after those events took place.
-                   The first graph breaks down the Florida registration numbers
-                   by party, and the second combines all of the parties."),
+                 h2("Linegraphs"),
+                 
+                 p("First, I created two linegraphs showing voter registrations
+                   over time. I then added vertical lines on the x-axis denoting
+                   the occurrence of significant events in 2020. The goal was to
+                   see if there was any noticeable change in registrations
+                   immediately after such events took place. The first graph
+                   breaks down the Florida registration numbers by party, and 
+                   the second combines all of the parties."),
                  
                  br(),
                  
-                 p("According to both of the regressions below, there does not
+                 p("According to both of the linegraphs below, there does not
                    seem to be any significant change in voter registration
                    levels immediately after the events indicated by the vertical
                    lines. It does appear, as one would expect, that
@@ -70,8 +73,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  br(),
                  
-                 # These functions plot the first two graphs in the Data 
-                 # Visualization panel!
+                 # These functions plot the first two graphs in the Data
+                 # Visualization panel.
                  
                  plotOutput("registration_numbers"),
                  
@@ -79,23 +82,28 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  plotOutput("registration_numbers2"),
                  
-                 h2("Interactive Maps"),
-                 p("Second, I created three interactive maps to see if there 
-                   were any striking visual similarities or differences between
-                   the datasets I used. The user can select the month and
-                   visually compare rising unemployment and COVID-19 cases with
-                   increasing voter registrations across different Florida
+                 # This is where I interpret the maps and explain the
+                 # interactive feature.
+                 
+                 h2("Maps"),
+                 
+                 p("Second, I created interactive maps to see if there were any
+                   striking visual similarities or differences between the
+                   datasets I used. The user can select the month and visually
+                   compare rising unemployment and COVID-19 cases with
+                   increasing voter registrations across different Florida 
                    counties."),
                  
                  br(),
                  
                  h3("Total Voter Registrations by Month in Florida"),
+                 
                  h4("(Hover over the map to see the county name and voter
                     registration numbers.)"),
                  
                  br(),
                  
-                 # Here, I create the drop down list. I make sure it shows the
+                 # Here, I create the drop-down list. I make sure it shows the
                  # full names of each month--not just lowercase abbreviations.
                  
                  selectInput("A", "Choose month:",
@@ -110,7 +118,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  # This is the code for the second drop down list, which allows
                  # the user to choose a party and see the relevant data. I 
-                 # reformat the names of the parties here.
+                 # reformat the names of the parties here. At first, I tried
+                 # a shorter way of doing this, but it didn't work.
                  
                  selectInput("A2", "Choose party:",
                              c("Democrat" = "florida_democratic_party",
@@ -119,13 +128,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                "No Party Affiliation" = "no_party_affiliation",
                                "Totals" = "totals")),
                  
-                 #Here is an alternate way of doing the same step:
-      
-                 #selectInput("A2", "Choose party:", combined_full$party,
-                             #selected = "florida_democratic_party"),
-                 
-                 # This Leaflet is the map that I display below. This command
-                 # prints the beautiful map. Exciting!
+                 # The leafletOutput() command here displays the map that I code
+                 # below.
                  
                  leafletOutput("registration_numbers3"),
                  
@@ -134,10 +138,14 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  br(),
                  
                  h3("Total COVID-19 Cases in Florida by Month"),
+                 
                  h4("(Hover over the map to see the county name and number of 
                     cases and deaths.)"),
                  
                  br(),
+                 
+                 # Here, I set up the second drop-down list using the
+                 # selectInput() command.
                  
                  selectInput("B", "Choose month:",
                              c("January" = 1,
@@ -151,15 +159,24 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                "September" = 9,
                                "October" = 10,
                                "November" = 11)),
+                 
+                 # This command prints the second map which displays COVID cases
+                 # and deaths.
+                 
                  leafletOutput("covid_cases"),
                  
                  br(),
                  
+                 # Title and subtitle for the final map.
+                 
                  h3("Total Unemployment Numbers in Florida by Month"),
+                 
                  h4("(Hover over the map to see the county name and number of 
                     unemployment and employment numbers.)"),
                  
                  br(),
+                 
+                 # Here, I create a second drop-down list.
                  
                  selectInput("C", "Choose month:",
                              c("January" = 1,
@@ -172,10 +189,12 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                "August" = 8,
                                "September" = 9,
                                "October" = 10)),
+                 
                  leafletOutput("job_numbers")
                  
-                 
         ),
+        
+        # The code below is for the second panel.
         
         tabPanel("Model",
 
@@ -211,9 +230,13 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  
                  br(),
                  
+                 # This command prints the table in my "Model" panel.
+                 
                  gt_output("table"),
                  
                  ),
+        
+        # The code below is for the "About" panel.
         
         tabPanel("About",
 
@@ -229,12 +252,14 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                    registration numbers. By quantifying the relationship, one
                    can gain insights as to which variables were the strongest
                    predictors of voter registrations. Although my model is 
-                   predictive rather than causal, it still could potentially
-                   allow one to better understand the forces which impel people 
-                   to take the first step in getting involved in the electoral
-                   process."),
+                   predictive rather than causal, it still could allow one to
+                   begin to understand the forces which impel people to take the
+                   first step in getting involved in the electoral process."),
                  
                  h3("About the Data"),
+                 
+                 # Here, I create a few links in the text.
+                 
                  p("I decided to hone in on the State of Florida, a critical 
                    battleground state which has long been considered a
                    microcosm of U.S. politics. I gathered the data on
@@ -255,21 +280,19 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                  h3("About Me"),
                  
                  p("My name is Josiah Meadows, and I am a sophomore at Harvard
-                 University pursuing a B.A. in Government with a secondary in
-                Economics. Contact me at josiahmeadows@college.harvard.edu. The
-                   source code on my Github can be found",
+                   University pursuing a B.A. in Government with a secondary in
+                   Economics. Contact me at josiahmeadows@college.harvard.edu.
+                   The source code on my Github can be found",
                    a("here.",
                      href = "https://github.com/JosiahMeadows/Elections-Data"),
                    "My LinkedIn profile can be found",
                    a("here.",
                      href = "https://www.linkedin.com/in/josiah-meadows-1441601b5/")),
-
-
+                 
         )
         
-
-        
     )
+    
 )
 
 # Define server logic required to plot the graphs and maps
@@ -277,13 +300,20 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 
 server <- function(input, output) {
-    
+  
+  # Here, I put the necessary code in the server so that the Shiny App can
+  # create the visualizations. The plotOutput() command above in the UI
+  # actually prints the graph, but I have to code the graph here in the server.
+  # Unless I put the code for the graphics here in the server, the plotOutput()
+  # function above cannot produce anything.
+
     output$registration_numbers <- renderPlot({
-        combined_fl %>% 
-            
-            # Here, I tell it to create the first plot.
-            
-            ggplot(mapping = aes(x = month, y = value, color = party, group = party)) +
+  
+        combined_fl %>%
+            ggplot(mapping = aes(x = month,
+                                 y = value,
+                                 color = party,
+                                 group = party)) +
             geom_line(lwd = 1) +
             labs(title = "Monthly Change in Florida Registration by Party (2019-2020)",
                  x = "Month",
@@ -301,12 +331,12 @@ server <- function(input, output) {
                                labels = c("Democratic", "Republican")) +
             scale_y_continuous(labels = scales::comma) +
             
-            # Create the vertical lines!
+            # Create the vertical lines on the x-axis. 
             
             geom_vline(xintercept = "Mar.", color = "gray") +
             geom_vline(xintercept = "June", color = "gray") +
             
-            # Add the text to describe the lines!
+            # Add the text to show what the lines denote.
             
             geom_text(aes(x = "Mar.",
                           y = 5000000,
@@ -321,7 +351,13 @@ server <- function(input, output) {
 
     })
     
-    # Now let's go ahead and create the second plot!
+    # Now let's go ahead and create the second plot.
+    
+    # Again, I put the necessary code in the server so that the Shiny App can
+    # create the visualizations. The plotOutput() command above in the UI
+    # actually prints the graph, but I have to code the graph here in the server.
+    # Unless I put the code for the graphics here in the server, the plotOutput()
+    # function above cannot produce anything.
     
     output$registration_numbers2 <- renderPlot({
         
@@ -342,12 +378,12 @@ server <- function(input, output) {
                   plot.caption = element_text(face = "italic")) +
             scale_y_continuous(labels = scales::comma) +
             
-            # Create the vertical lines
+            # Create the vertical lines on the x-axis.
             
             geom_vline(xintercept = "Mar.", color = "gray") +
             geom_vline(xintercept = "June", color = "gray") +
             
-            # Add the text to describe the lines
+            # Add the text to show what the lines denote.
             
             geom_text(aes(x = "Mar.",
                           y = 13650000,
@@ -362,12 +398,21 @@ server <- function(input, output) {
       
     })
  
-# Now this is the really cool part where I add the maps. Leaflet allows us to
-# to do that!
-       
+    # Now this is the part where I include the code for the maps.
+    # Same drill: put the necessary code in the server so that the Shiny App can
+    # create the visualizations. The plotLeaflet() command above in the UI
+    # actually prints the map, but I have to code the graph here in the server.
+    # Unless I put the code for the maps here in the server, the plotLeaflet()
+    # function above cannot produce anything.
+    
     output$registration_numbers3 <- renderLeaflet({
+      
+      # This code specifies the county shapes for the state of Florida. 12 is
+      # the number of Florida.
  
       county_shapes <- counties(state = "12", cb = TRUE)
+      
+      # This code maps back to the selectInput() function above in the UI.
     
       sb_county <- combined_full %>% 
         filter(month == input$A) %>%
@@ -375,23 +420,35 @@ server <- function(input, output) {
         clean_names() %>% 
         select(county, totals = value)
       
+      # Using the geo_join() command, I combined the the registration data with
+      # the county shapes.
+      
       counties_merged_sb <- geo_join(county_shapes, sb_county, "NAME", "county")
       
-      # This is where I specify the specific shades of greens and the numbers
+      # This is where I specify the specific shades of green and the numbers
       # to which they correspond.
       
       pal <- colorBin("Greens",
-                      bins = c(0, 100, 500, 1000, 5000, 10000, 100000, 200000, Inf))
+                      bins = c(0,
+                               100,
+                               500,
+                               1000,
+                               5000,
+                               10000,
+                               100000,
+                               200000,
+                               Inf))
       
-      # This creates the nice popup feature which gives the user the
+      # This creates the nice pop-up feature which allows the user to see the
       # information.
 
       popup_sb <- paste("County: ", as.character(counties_merged_sb$NAME),
                          "Total Registrations: ",
                         as.character(counties_merged_sb$totals))
       
-      # Finally, print the map. The code below also highlights individual
-      # counties, a nice enhancement to the interactive experience!
+      # Finally, I write the code for printing the map. The code below also
+      # highlights individual counties--a nice enhancement to the interactive
+      # experience. Almost everything below is for style.
       
       leaflet() %>% 
         addProviderTiles("CartoDB.Positron") %>% 
@@ -420,9 +477,9 @@ server <- function(input, output) {
       
     })
     
-    # This is where I create the second map, following the same rules as the 
-    # first. I simply tailor a few things now that we're dealing with Covid-19
-    # data instead of voter registrations. (Red instead of Green, etc).
+    # This is where I provide the code for the second map, following the same
+    # rules as the first map. I simply tailor a few things now that I'm dealing
+    # with COVID-19 data instead of voter registrations.
     
     output$covid_cases <- renderLeaflet({
       
@@ -433,15 +490,29 @@ server <- function(input, output) {
         drop_na() %>% 
         filter(month == input$B)
       
-      counties_merged_sb2 <- geo_join(county_shapes, sb_county2, "NAME", "county")
+      counties_merged_sb2 <- geo_join(county_shapes,
+                                      sb_county2,
+                                      "NAME",
+                                      "county")
       
-      pal <- colorBin("Reds", bins = c(0, 100, 500, 1000, 5000, 10000, 100000, 200000, Inf))
+      # Instead of green, I now use red for the map with COVID-19 data.
+      
+      pal <- colorBin("Reds", bins = c(0,
+                                       100,
+                                       500,
+                                       1000,
+                                       5000,
+                                       10000,
+                                       100000,
+                                       200000, Inf))
       
       popup_sb2 <- paste("County: ", as.character(counties_merged_sb2$NAME),
-                         "New Cases: ", as.character(counties_merged_sb2$total_cases),
-                         "New Deaths: ", as.character(counties_merged_sb2$total_deaths))
+                         "New Cases: ",
+                         as.character(counties_merged_sb2$total_cases),
+                         "New Deaths: ",
+                         as.character(counties_merged_sb2$total_deaths))
       
-      # Create the map!
+      # Code for the map is below.
       
       leaflet() %>% 
         addProviderTiles("CartoDB.Positron") %>% 
@@ -469,6 +540,10 @@ server <- function(input, output) {
       
     })
     
+    # This is where I provide the code for the second map, following the same
+    # rules as the first map. I simply tailor a few things now that I'm dealing
+    # with unemployment data instead of voter registrations.
+    
     output$job_numbers <- renderLeaflet({
       
       county_shapes <- counties(state = "12", cb = TRUE)
@@ -480,8 +555,18 @@ server <- function(input, output) {
       
       counties_merged_sb3 <- geo_join(county_shapes, sb_county3, "NAME", "county")
       
+      # Instead of red, I now use orange for the map with unemployment data.
+      
       pal <- colorBin("Oranges",
-                      bins = c(0, 100, 500, 1000, 5000, 10000, 100000, 200000, Inf))
+                      bins = c(0,
+                               100,
+                               500,
+                               1000,
+                               5000,
+                               10000,
+                               100000,
+                               200000,
+                               Inf))
       
       popup_sb3 <- paste("County: ", as.character(counties_merged_sb3$NAME),
                           "Total Unemployment: ",
@@ -489,7 +574,7 @@ server <- function(input, output) {
                           "Total Employment: ", 
                           as.character(counties_merged_sb3$total_emp))
       
-      # Create the map!
+      # Code for the map.
       
       leaflet() %>% 
         addProviderTiles("CartoDB.Positron") %>% 
@@ -517,6 +602,11 @@ server <- function(input, output) {
       
     })
 
+    # Finally, this is where I provide the code for the table in the "Model"
+    # panel. Without this code, the gt_output() function above cannot produce
+    # anything.
+    
+    
     output$table <- render_gt({
       
       table %>% 
